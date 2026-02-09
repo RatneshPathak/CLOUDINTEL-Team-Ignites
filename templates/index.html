@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudIntel | Team Ignites Edition</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --neon: #00d2ff;
+            --bg: #05070a;
+            --panel: rgba(13, 17, 23, 0.95);
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(0, 210, 255, 0.15);
+        }
+
+        body {
+            background: var(--bg);
+            background-image: radial-gradient(circle at 50% 50%, rgba(0, 210, 255, 0.05) 0%, transparent 80%);
+            color: #e6edf3;
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        .navbar-top { 
+            background: rgba(13, 17, 23, 0.85); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); height: 70px;
+            display: flex; align-items: center; justify-content: space-between; padding: 0 30px;
+            z-index: 100;
+        }
+
+        .app-body { display: grid; grid-template-columns: 280px 1fr 320px; flex-grow: 1; overflow: hidden; }
+        .side-panel { background: var(--panel); padding: 25px; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+
+        #chat-feed { flex-grow: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; margin-bottom: 80px; }
+        
+        .ai-response { 
+            background: var(--glass); border-left: 3px solid var(--neon); border-radius: 12px;
+            padding: 25px; margin-bottom: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            transition: all 0.3s ease;
+        }
+
+        /* --- NEW: Relevance Gauge CSS --- */
+        .relevance-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .relevance-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--neon);
+            box-shadow: 0 0 10px var(--neon);
+            transition: width 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* --- NEW: History Entry Styling --- */
+        .history-entry {
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+        .history-entry:hover { background: rgba(0, 210, 255, 0.05); }
+
+        .input-container {
+            position: fixed; bottom: 100px; left: 320px; right: 360px;
+            background: rgba(15, 20, 28, 0.98); border: 1px solid var(--neon);
+            border-radius: 50px; padding: 12px 25px; display: flex; align-items: center;
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.2); z-index: 100;
+        }
+        .input-container input { background: transparent; border: none; color: white; flex-grow: 1; outline: none; font-size: 1.1rem; }
+
+        .bottom-navbar {
+            position: fixed; bottom: 0; width: 100%; height: 70px;
+            background: rgba(10, 14, 20, 0.98); border-top: 1px solid var(--neon);
+            display: flex; justify-content: space-around; align-items: center;
+            backdrop-filter: blur(15px); z-index: 1000;
+        }
+
+        .team-ignites {
+            font-family: 'Orbitron', sans-serif; font-weight: bold; letter-spacing: 2px;
+            background: linear-gradient(90deg, #00d2ff, #9d50bb);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
+        }
+
+        .stat-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 15px; margin-bottom: 15px; }
+        .typing { border-right: 2px solid var(--neon); animation: blink 0.7s infinite; }
+        @keyframes blink { 50% { border-color: transparent; } }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar-top">
+        <div class="h4 mb-0 text-info"><i class="fas fa-atom me-2"></i>CLOUDINTEL</div>
+        <div class="badge bg-dark border border-info px-3 font-monospace">NEURAL CORE v3.0</div>
+    </nav>
+
+    <div class="app-body">
+        <aside class="side-panel">
+            <h6 class="text-secondary mb-3 small">SYSTEM ARCHITECTURE</h6>
+            <div class="stat-card">
+                <small class="text-info d-block mb-1">KNOWLEDGE SOURCE</small>
+                <div class="small fw-bold">Cloud_Computing.pdf</div>
+                <small class="text-muted">389 Verified Pages</small>
+            </div>
+            
+            <div class="stat-card mt-2" style="flex-grow: 1; overflow-y: auto;">
+                <h6 class="text-info small mb-3"><i class="fas fa-history me-2"></i>SESSION HISTORY</h6>
+                <div id="query-history">
+                    <em class="small text-muted">No recent queries.</em>
+                </div>
+            </div>
+
+            <div class="mt-auto py-3">
+                <span class="text-success small"><i class="fas fa-circle me-2 animate__animated animate__pulse animate__infinite"></i>RAG Constrained Mode</span>
+            </div>
+        </aside>
+
+        <main id="chat-feed">
+            <div id="results-area">
+                <div class="welcome-section text-center py-5 animate__animated animate__fadeIn">
+                    <h2 class="display-6 fw-bold">Neural Knowledge Retrieval</h2>
+                    <p class="text-secondary">AI-driven extraction with semantic post-processing.</p>
+                </div>
+            </div>
+        </main>
+
+        <aside class="side-panel" style="border-left: 1px solid var(--border); border-right:none;">
+            <h6 class="text-secondary mb-4 small">EVIDENCE LOG</h6>
+            <div class="stat-card">
+                <small class="text-muted d-block">QUERY LATENCY</small>
+                <span id="lat-val" class="h5 mb-0 text-info fw-bold">-- ms</span>
+            </div>
+            
+            <div class="stat-card">
+                <small class="text-muted d-block">SEMANTIC RELEVANCE</small>
+                <span id="rel-val" class="h5 mb-0 text-info fw-bold">-- %</span>
+                <div class="relevance-bar">
+                    <div id="rel-fill" class="relevance-fill"></div>
+                </div>
+            </div>
+
+            <div class="mt-auto p-3 bg-dark border border-secondary rounded text-center">
+                <small class="text-muted">Compliance Status</small>
+                <div class="text-info small"><i class="fas fa-check-double me-1"></i>Traceability Verified</div>
+            </div>
+        </aside>
+    </div>
+
+    <div class="input-container">
+        <input type="text" id="query-input" placeholder="Enter semantic query..." autocomplete="off">
+        <button id="submit-btn" style="background:none; border:none; color:var(--neon);"><i class="fas fa-paper-plane fa-lg"></i></button>
+    </div>
+
+    <footer class="bottom-navbar animate__animated animate__slideInUp">
+        <div class="small text-muted font-monospace">MODE: LOCAL INFERENCE</div>
+        <div class="team-ignites">CREATED BY TEAM IGNITES</div>
+        <div class="small text-info"><i class="fas fa-microchip me-2"></i>HACKATHON BUILD</div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

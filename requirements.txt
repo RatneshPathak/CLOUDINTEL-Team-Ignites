@@ -1,0 +1,12 @@
+Create a file named `requirements.txt` in your root folder and paste these exact versions:
+
+```text
+flask==3.0.0
+langchain-community==0.0.10
+langchain-huggingface==0.0.1
+faiss-cpu==1.7.4
+pypdf==3.17.1
+sentence-transformers==2.2.2
+numpy==1.26.2
+
+pip install flask langchain-community langchain-huggingface faiss-cpu pypdf sentence-transformers
